@@ -1,0 +1,3 @@
+# State Machine Fuzzing Guide
+
+Work in progress...
