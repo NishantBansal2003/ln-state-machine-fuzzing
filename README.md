@@ -93,6 +93,8 @@ Network implementations:
 
 The following fuzz tests were added to improve state machine fuzzing coverage across different implementations:
 
+### Implementation-Specific Fuzz Tests
+
 - **LND**
   - htlcswitch: add htlc state machine fuzz tests: [PR #10773](https://github.com/lightningnetwork/lnd/pull/10773)
   - discovery+lnmock: add gossip state machine fuzz tests: [PR #10605](https://github.com/lightningnetwork/lnd/pull/10605)
@@ -108,6 +110,20 @@ The following fuzz tests were added to improve state machine fuzzing coverage ac
     - Add fuzz tests for onion, route blinding and lightning message codecs: [PR #3282](https://github.com/ACINQ/eclair/pull/3282)
     - Add fuzz tests for Bolt11 and Bolt12 deserialization: [PR #3292](https://github.com/ACINQ/eclair/pull/3292)
 
+### Cross-Implementation Fuzz Tests via Smite
+
+Some state machines are being tested via [smite](https://github.com/morehouse/smite), which enables writing a single state machine fuzz test that can be executed against all Lightning Network implementations. This approach significantly reduces the manual work required to test the same scenarios across different implementations.
+
+The following state machines will be tested via smite:
+- Legacy Channel Establishment
+- Dual-Funded Channel Establishment
+- Normal Operation / HTLCs & Commitments
+- Channel Mutual Close
+
+***Note:** Additional state machines will be added as the smite project evolves and high-priority scenarios are implemented.*
+
+See my [smite PRs](https://github.com/morehouse/smite/pulls?q=is%3Apr+author%3ANishantBansal2003+is%3Aclosed) for the implementation details.
+
 ## Issues Discovered
 
 Through this fuzzing effort, several bugs and issues have been discovered across different Lightning Network implementations:
@@ -121,4 +137,4 @@ Through this fuzzing effort, several bugs and issues have been discovered across
 - **Bolts**
   - Incorrect HTLC deductions in Appendix C/F test vectors: [Issue #1335](https://github.com/lightning/bolts/issues/1335)
 
-**Note:** Additional security-sensitive issues were discovered during this work but have not been publicly disclosed. These vulnerabilities are being handled through responsible disclosure processes with the respective implementation teams.
+***Note:** Additional security-sensitive issues were discovered during this work but have not been publicly disclosed. These vulnerabilities are being handled through responsible disclosure processes with the respective implementation teams.*
