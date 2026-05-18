@@ -46,7 +46,7 @@ Network implementations:
       <td align="center">⏳</td>
       <td align="center">⏳</td>
       <td align="center">❌</td>
-      <td align="center">❌</td>
+      <td align="center">✅</td>
     </tr>
     <tr>
       <td>Peer Storage / Backup</td>
@@ -88,3 +88,22 @@ Network implementations:
 
 
 **Legend:** ✅ Implemented · ❌ Not Implemented · ⏳ In Progress · 🚫 Not Supported · 🔌 Externally Managed
+
+## Fuzz Test Coverage
+
+The following fuzz tests were added to improve state machine fuzzing coverage across different implementations:
+
+- **LND**
+  - htlcswitch: add htlc state machine fuzz tests: [PR #10773](https://github.com/lightningnetwork/lnd/pull/10773)
+  - discovery+lnmock: add gossip state machine fuzz tests: [PR #10605](https://github.com/lightningnetwork/lnd/pull/10605)
+
+- **LDK**
+  - fuzz: add fuzz target for P2PGossipSync gossip message handling: [PR #4532](https://github.com/lightningdevkit/rust-lightning/pull/4532)
+
+- **CLN**
+  - fuzz: add test for the gossipd message processing: [PR #9115](https://github.com/ElementsProject/lightning/pull/9115)
+
+- **Eclair**
+  - Eclair lacked fuzzing engine support, so I added Jazzer-based fuzz testing support in [PR #3276](https://github.com/ACINQ/eclair/pull/3276). I also added basic fuzz tests to bring coverage more in line with other Lightning implementations, including:
+    - Add fuzz tests for onion, route blinding and lightning message codecs: [PR #3282](https://github.com/ACINQ/eclair/pull/3282)
+    - Add fuzz tests for Bolt11 and Bolt12 deserialization: [PR #3292](https://github.com/ACINQ/eclair/pull/3292)
