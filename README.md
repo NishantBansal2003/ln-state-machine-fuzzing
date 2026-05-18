@@ -107,3 +107,18 @@ The following fuzz tests were added to improve state machine fuzzing coverage ac
   - Eclair lacked fuzzing engine support, so I added Jazzer-based fuzz testing support in [PR #3276](https://github.com/ACINQ/eclair/pull/3276). I also added basic fuzz tests to bring coverage more in line with other Lightning implementations, including:
     - Add fuzz tests for onion, route blinding and lightning message codecs: [PR #3282](https://github.com/ACINQ/eclair/pull/3282)
     - Add fuzz tests for Bolt11 and Bolt12 deserialization: [PR #3292](https://github.com/ACINQ/eclair/pull/3292)
+
+## Issues Discovered
+
+Through this fuzzing effort, several bugs and issues have been discovered across different Lightning Network implementations:
+
+- **LND**
+  - [bug]: Force close triggered on restart during incomplete commit dance: [Issue #10618](https://github.com/lightningnetwork/lnd/issues/10618)
+
+- **Eclair**
+  - parseinvoice accepts BOLT 11 invoice with non-zero bech32 padding bits: [Issue #3281](https://github.com/ACINQ/eclair/issues/3281)
+
+- **Bolts**
+  - Incorrect HTLC deductions in Appendix C/F test vectors: [Issue #1335](https://github.com/lightning/bolts/issues/1335)
+
+**Note:** Additional security-sensitive issues were discovered during this work but have not been publicly disclosed. These vulnerabilities are being handled through responsible disclosure processes with the respective implementation teams.
