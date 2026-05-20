@@ -130,6 +130,8 @@ Through this fuzzing effort, several bugs and issues have been discovered across
 
 - **LND**
   - [bug]: Force close triggered on restart during incomplete commit dance: [Issue #10618](https://github.com/lightningnetwork/lnd/issues/10618)
+  - discovery: fix race on remoteUpdateHorizon in GossipSyncer: [PR #10530](https://github.com/lightningnetwork/lnd/pull/10530)
+  - discovery: enforce strict validation of peer gossip messages: [PR #10581](https://github.com/lightningnetwork/lnd/pull/10581)
 
 - **Eclair**
   - parseinvoice accepts BOLT 11 invoice with non-zero bech32 padding bits: [Issue #3281](https://github.com/ACINQ/eclair/issues/3281)
