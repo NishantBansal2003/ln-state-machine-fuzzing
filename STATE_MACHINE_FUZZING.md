@@ -95,6 +95,36 @@ into those for the engine-specific details.
   stdout logging in that file to inspect failure logs from the relevant LND subsystem:
   `go test ./discovery -run=FuzzGossipStateMachine/<fail-filename> -v`
 
+### LDK
+
+- **Language:** Rust
+- **Fuzzing engine:** `honggfuzz`, `libFuzzer` and `AFL`
+- **Fuzzing docs:**
+  - https://github.com/lightningdevkit/rust-lightning/blob/main/fuzz/README.md
+- **Run continuously:** I currently use `libFuzzer` most of the time, so the
+  commands below focus on that. For honggfuzz and AFL, refer to the LDK fuzzing
+  documentation. fuzz the `gossip_discovery_target` target:
+  ```shell
+  cd fuzz
+  export RUSTFLAGS="--cfg=fuzzing --cfg=secp256k1_fuzz --cfg=hashes_fuzz"
+  cargo +nightly fuzz run --fuzz-dir fuzz-fake-hashes --features "libfuzzer_fuzz" gossip_discovery_target
+  ```
+- **Corpus location:** `$PWD/fuzz/{fuzz-dir(mentioned above)}/corpus/gossip_discovery_target`
+- **Coverage report:**
+  ```shell
+  cargo +nightly fuzz coverage --fuzz-dir fuzz-fake-hashes --features "libfuzzer_fuzz" gossip_discovery_target
+  llvm-cov show target/aarch64-apple-darwin/coverage/aarch64-apple-darwin/release/gossip_discovery_target \
+  	-instr-profile=fuzz-fake-hashes/coverage/gossip_discovery_target/coverage.profdata \
+  	-format=html \
+  	-output-dir=coverage-html \
+  	-show-line-counts-or-regions \
+	-show-instantiations=false
+  ```
+- **Reproduce a crash:**
+  ```shell
+  cargo +nightly fuzz run --fuzz-dir fuzz-fake-hashes --features=libfuzzer_fuzz gossip_discovery_target {fuzz-dir(mentioned above)}/artifacts/gossip_discovery_target/crash-file-name
+  ```
+
 ### CLN
 
 - **Language:** C
