@@ -95,6 +95,41 @@ into those for the engine-specific details.
   stdout logging in that file to inspect failure logs from the relevant LND subsystem:
   `go test ./discovery -run=FuzzGossipStateMachine/<fail-filename> -v`
 
+### CLN
+
+- **Language:** C
+- **Fuzzing engine:** `libFuzzer`
+- **Fuzzing docs:**
+  - https://github.com/ElementsProject/lightning/blob/master/doc/contribute-to-core-lightning/testing.md
+  - https://github.com/ElementsProject/lightning/pull/8885
+  - https://llvm.org/docs/LibFuzzer.html
+- **Run continuously:** fuzz `fuzz-gossipd` on 8 workers
+  ```shell
+  # Build CLN for fuzzing
+  ./configure CC=clang --enable-fuzzing --enable-address-sanitizer --enable-ub-sanitizer --disable-valgrind
+  # Build the fuzz target
+  make tests/fuzz/fuzz-gossipd
+  # Start fuzzing
+  ./tests/fuzz/fuzz-gossipd -jobs=8 -workers=8 tests/fuzz/corpora/fuzz-gossipd
+  ```
+- **Corpus location:** `tests/fuzz/corpora/fuzz-gossipd`
+- **Coverage report:**
+  ```shell
+  # Build CLN with coverage instrumentation
+  ./configure CC=clang --enable-fuzzing --enable-address-sanitizer --enable-ub-sanitizer --disable-valgrind --enable-coverage CC=clang
+  # Build the fuzz target
+  make tests/fuzz/fuzz-gossipd
+  # Generate coverage reports
+  LLVM_PROFILE_FILE="default.profraw" ./tests/fuzz/fuzz-gossipd -runs=0 tests/fuzz/corpora/fuzz-gossipd
+  llvm-profdata merge -sparse default.profraw -o default.profdata
+  llvm-cov show ./tests/fuzz/fuzz-gossipd \
+    -instr-profile=default.profdata \
+    -format=html \
+    -output-dir=coverage-html \
+    -show-line-counts-or-regions
+  ```
+- **Reproduce a crash:** `./tests/fuzz/fuzz-gossipd crash-file-name`
+
 ### Eclair
 
 - **Language:** Scala
