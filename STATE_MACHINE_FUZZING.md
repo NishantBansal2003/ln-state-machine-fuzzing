@@ -94,3 +94,24 @@ into those for the engine-specific details.
 - **Reproduce a crash:** LND uses `log.go` for subsystem-specific logging. Enable
   stdout logging in that file to inspect failure logs from the relevant LND subsystem:
   `go test ./discovery -run=FuzzGossipStateMachine/<fail-filename> -v`
+
+### Eclair
+
+- **Language:** Scala
+- **Fuzzing engine:** Jazzer based on `libFuzzer`
+- **Fuzzing docs:**
+  - https://github.com/CodeIntelligenceTesting/jazzer
+  - https://github.com/ACINQ/eclair/blob/master/eclair-fuzz/README.md
+- **Run continuously:**
+  ```shell
+  # Rebuild eclair-core before fuzzing new changes.
+  ./mvnw clean install -pl eclair-core -am -DskipTests
+  JAZZER_FUZZ=1 ./mvnw test -f eclair-fuzz/pom.xml -Dtest=<TestClass>#<fuzzMethod>
+  ```
+- **Corpus location:** `$PWD$/eclair-fuzz/.cifuzz-corpus/<Package>.<TestClass>/<fuzzMethod>`
+- **Coverage report:** To generate an HTML coverage report, download and unzip a [JaCoCo](https://github.com/jacoco/jacoco/releases) release, then run:
+  ```shell
+  ./eclair-fuzz/generate-coverage-report.sh /path/to/jacoco/lib
+  ```
+- **Reproduce a crash:** Replay crash inputs only (all fuzz targets)
+  `./mvnw test -f eclair-fuzz/pom.xml`
