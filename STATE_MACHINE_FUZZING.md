@@ -57,11 +57,11 @@ blown assertions, or invariants that should never break but do.
 
 ## Running it per-implementation
 
-Here's how to run some fuzz tests and pull a coverage report from the target.
-Please note that there's a lot more to each engine than this, more flags, more
-commands. I've only pulled out the handful I reach for most. For everything else
-I've linked each implementation's own fuzzing doc, so go dig into those for the
-engine-specific details.
+Here's how to run some fuzz tests, pull a coverage report and reproduce a crash
+from the target. Please note that there's a lot more to each engine than this,
+more flags, more commands. I've only pulled out the handful I reach for most.
+For everything else I've linked each implementation's own fuzzing doc, so go dig
+into those for the engine-specific details.
 
 ### LND
 
@@ -70,7 +70,7 @@ engine-specific details.
 - **Fuzzing docs:**
   - https://go.dev/doc/security/fuzz
 - **Run continuously:** fuzz `FuzzGossipStateMachine` on 8 workers:
-  ```sh
+  ```shell
   go test ./discovery \
     -fuzz='^FuzzGossipStateMachine$' \
     -run='^$' \
@@ -80,7 +80,7 @@ engine-specific details.
 - **Corpus location:** `$PWD/discovery/testdata/fuzz/FuzzGossipStateMachine/*`
 - **Coverage report:** build a profile from the collected corpus, then render
   it to HTML:
-  ```sh
+  ```shell
   go test ./discovery \
     -run='FuzzGossipStateMachine' \
     -coverprofile=coverage.out \
@@ -91,26 +91,6 @@ engine-specific details.
   The `-timeout` matters once the corpus gets large: the coverage run replays
   every input, so a big corpus can blow past the default timeout. Bump it up (or
   drop the flag entirely while the corpus is still small).
-
-### LDK
-
-### CLN
-
-### Eclair
-
-## Running it cross-implementation
-
-The nice thing about smite is that it's implementation-agnostic. You model a
-state machine once and that single fuzz test runs across all four
-implementations, instead of hand-writing a custom test for each engine. That
-saves a ton of time.
-
-That said, this is complementary to per-implementation fuzzing, not a
-replacement. Don't think of it as "just run smite and skip the
-implementation-specific tests." Because smite fuzzes the implementations
-agnostically, behaviour can vary from one to the next, so there are plenty of
-cases and assertions you can check inside a single implementation's own fuzz
-test that simply aren't possible in smite. Keep writing the standalone tests
-alongside it.
-
-### Smite
+- **Reproduce a crash:** LND uses `log.go` for subsystem-specific logging. Enable
+  stdout logging in that file to inspect failure logs from the relevant LND subsystem:
+  `go test ./discovery -run=FuzzGossipStateMachine/<fail-filename> -v`
