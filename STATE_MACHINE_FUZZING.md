@@ -115,3 +115,78 @@ into those for the engine-specific details.
   ```
 - **Reproduce a crash:** Replay crash inputs only (all fuzz targets)
   `./mvnw test -f eclair-fuzz/pom.xml`
+
+## Running it cross-implementation
+
+The nice thing about smite is that it's implementation-agnostic. You model a
+state machine once and that single fuzz test runs across all four
+implementations, instead of hand-writing a custom test for each engine. That
+saves a ton of time.
+
+That said, this is complementary to per-implementation fuzzing, not a
+replacement. Don't think of it as "just run smite and skip the
+implementation-specific tests." Because smite fuzzes the implementations
+agnostically, behaviour can vary from one to the next, so there are plenty of
+cases and assertions you can check inside a single implementation's own fuzz
+test that simply aren't possible in smite. Keep writing the standalone tests
+alongside it.
+
+### Smite
+
+- **Language:** Rust
+- **Fuzzing engine:** AFL++ with Nyx (currently)
+- **Fuzzing docs:**
+  - https://github.com/morehouse/smite
+  - https://github.com/AFLplusplus/AFLplusplus
+  - https://github.com/dergoegge/fuzzamoto
+  - https://github.com/google/syzkaller
+- **Run continuously** — only the IR scenario is shown here; for the others
+  check the smite docs:
+
+  ```sh
+  TARGET=ldk
+  SCENARIO=ir
+
+  # Build the Docker image and Nyx sharedir as above
+  docker build -t smite-$TARGET-$SCENARIO -f workloads/$TARGET/Dockerfile --build-arg SCENARIO=$SCENARIO .
+  ./scripts/setup-nyx.sh /tmp/smite-nyx smite-$TARGET-$SCENARIO ~/AFLplusplus
+
+  # Enable the KVM VMware backdoor (required for Nyx)
+  ./scripts/enable-vmware-backdoor.sh
+
+  # Build the custom mutator
+  cargo build --release -p smite-ir-mutator
+
+  # Create seed corpus (an empty file works -- the mutator generates fresh programs)
+  mkdir -p /tmp/smite-seeds
+  printf '\x00' > /tmp/smite-seeds/empty
+
+  # Start fuzzing with the custom mutator
+  AFL_CUSTOM_MUTATOR_LIBRARY=target/release/libsmite_ir_mutator.so \
+  AFL_CUSTOM_MUTATOR_ONLY=1 \
+  AFL_FRAMESHIFT_DISABLE=1 \
+  AFL_DISABLE_TRIM=1 \
+  ~/AFLplusplus/afl-fuzz -X -i /tmp/smite-seeds -o /tmp/smite-out -- /tmp/smite-nyx
+  ```
+
+- **Corpus location:** `/tmp/smite-out/default/queue/*`
+- **Coverage report:**
+
+  ```sh
+  # Generate coverage report
+  ./scripts/coverage-report.sh $TARGET $SCENARIO /tmp/smite-out/default/queue/
+
+  # View the report
+  firefox ./$TARGET-$SCENARIO-coverage-report/html/index.html
+  ```
+
+- **Reproduce a crash:**
+
+  ```sh
+  # Get the crash input
+  cp /tmp/smite-out/default/crashes/<crashing-input> ./crash
+  mkdir -p $DEBUG_DIR
+
+  # Reproduce in local mode (use the matching image and scenario binary)
+  docker run --rm -v $PWD/crash:/input.bin -e SMITE_INPUT=/input.bin -v "$DEBUG_DIR:/data" -e SMITE_DATA_DIR=/data smite-$TARGET-$SCENARIO /$TARGET-scenario
+  ```
