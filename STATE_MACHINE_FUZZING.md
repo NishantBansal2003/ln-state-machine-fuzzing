@@ -118,7 +118,7 @@ into those for the engine-specific details.
   	-format=html \
   	-output-dir=coverage-html \
   	-show-line-counts-or-regions \
-	-show-instantiations=false
+  	-show-instantiations=false
   ```
 - **Reproduce a crash:**
   ```shell
