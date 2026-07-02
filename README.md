@@ -16,9 +16,9 @@ Network implementations:
   <tbody>
     <tr>
       <td>Legacy Channel Establishment</td>
-      <td align="center">❌</td>
-      <td align="center">❌</td>
-      <td align="center">❌</td>
+      <td align="center">✅</td>
+      <td align="center">✅</td>
+      <td align="center">✅</td>
       <td align="center">✅</td>
     </tr>
     <tr>
@@ -114,16 +114,23 @@ The following fuzz tests were added to improve state machine fuzzing coverage ac
 
 Some state machines are being tested via [smite](https://github.com/morehouse/smite), which enables writing a single state machine fuzz test that can be executed against all Lightning Network implementations. This approach significantly reduces the manual work required to test the same scenarios across different implementations.
 
-The following state machines will be tested via smite:
+The table below tracks the state machines targeted via smite and their progress. PR links are added as each state machine's tests are implemented.
 
-- Legacy Channel Establishment
-- Dual-Funded Channel Establishment
-- Normal Operation / HTLCs & Commitments ([implementation plan](https://github.com/morehouse/smite/issues/111))
-- Channel Mutual Close
+| State Machine                          | Status         | PRs / Links                                                                                                     |
+| -------------------------------------- | -------------- | --------------------------------------------------------------------------------------------------------------- |
+| Legacy Channel Establishment           | 🚧 In progress | [PRs](https://github.com/morehouse/smite/pulls?q=is%3Apr+author%3ANishantBansal2003+created%3A%3C%3D2026-07-10) |
+| Normal Operation / HTLCs & Commitments | 📋 Planned     | [Implementation plan](https://github.com/morehouse/smite/issues/111)                                            |
+| Dual-Funded Channel Establishment      | 📋 Planned     | —                                                                                                               |
+| Channel Mutual Close                   | 📋 Planned     | —                                                                                                               |
+| Channel Reestablish                    | 📋 Planned     | —                                                                                                               |
+| Peer Storage / Backup                  | 📋 Planned     | —                                                                                                               |
+| Channel Splicing                       | 📋 Planned     | —                                                                                                               |
+
+Status legend: 📋 Planned · 🚧 In progress · ✅ Done
 
 _**Note:** Additional state machines will be added as the smite project evolves and high-priority scenarios are implemented._
 
-See my [smite PRs](https://github.com/morehouse/smite/pulls?q=is%3Apr+author%3ANishantBansal2003+is%3Aclosed) for the implementation details.
+See my [smite PRs](https://github.com/morehouse/smite/pulls?q=is%3Apr+author%3ANishantBansal2003+is%3Aclosed) for the full implementation details.
 
 ## Issues Discovered
 
