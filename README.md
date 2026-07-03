@@ -144,6 +144,7 @@ Through this fuzzing effort, several bugs and issues have been discovered across
 
 - **CLN**
   - openingd crashes on an assertion when a peer sends `open_channel` with `funding_satoshis > WALLY_SATOSHI_MAX` (3 variants, likely sharing a single fix, tracked in one thread): [Issue #9225](https://github.com/ElementsProject/lightning/issues/9225)
+  - Duplicate funding outpoint creates channels with the same `channel_id`: [Issue #9274](https://github.com/ElementsProject/lightning/issues/9274)
 
 - **Eclair**
   - parseinvoice accepts BOLT 11 invoice with non-zero bech32 padding bits: [Issue #3281](https://github.com/ACINQ/eclair/issues/3281)
